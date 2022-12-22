@@ -1,0 +1,46 @@
+{
+  "name": "webap-browser-extension",
+  "version": "0.0.1",
+  "description": "WebAP Browser Extension",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "chrome-webstore-upload-cli": "^1.1.1",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "copy-webpack-plugin": "^9.0.0",
+    "css-loader": "^5.2.6",
+    "eslint": "^7.29.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.3.1",
+    "json5": "^2.2.0",
+    "mini-css-extract-plugin": "^1.6.0",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.4",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.39.1",
+    "webpack-cli": "^4.7.2",
+    "webpack-merge": "^5.8.0"
+  },
+  "scripts": {
+    "start": "webpack --watch --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js",
+    "lint": "eslint \"src/**/*.js\"",
+    "release": "webstore upload --source=build_output/output.zip --auto-publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/webap-api/podStation.git"
+  },
+  "keywords": [
+    "webap",
+    "browser-extension"
+  ],
+  "author": "Guilherme Dellagustin (dellagustin.developer@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/webap-api/webap-browser-extension/issues"
+  },
+  "homepage": "https://github.com/webap-api/webap-browser-extension#readme"
+}

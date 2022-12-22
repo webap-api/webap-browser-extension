@@ -1,0 +1,16 @@
+{
+	"name": "WebAP",
+	"short_name": "WebAP",
+	"author": "Guilherme Dellagustin",
+	"description": "WebAP implementation for your browser",
+	"default_locale": "en",
+	"permissions": [
+		"storage",
+		"https://*/"
+	],
+	"browser_action": {
+		"default_title": "WebAP"
+	},
+	"manifest_version": 3,
+	"options_page": "options.html"
+}
