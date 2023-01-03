@@ -1,16 +1,22 @@
 {
+	"manifest_version": 3,
 	"name": "WebAP",
 	"short_name": "WebAP",
 	"author": "Guilherme Dellagustin",
 	"description": "WebAP implementation for your browser",
 	"default_locale": "en",
 	"permissions": [
-		"storage",
-		"https://*/"
+		"storage"
 	],
-	"browser_action": {
-		"default_title": "WebAP"
-	},
-	"manifest_version": 3,
+	"content_scripts": [{
+		"matches": ["https://*/*"],
+		"js": ["content-script.js"],
+		"run_at": "document_start",
+		"all_frames": true
+	}],
+	"web_accessible_resources": [{
+		"resources": ["inpage-script.js"],
+		"matches": ["https://*/*"]
+	}],
 	"options_page": "options.html"
 }

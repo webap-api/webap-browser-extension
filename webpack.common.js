@@ -8,12 +8,14 @@ const packageInformation = require('./package.json');
 
 module.exports = {
 	entry: {
-		options: './src/options',
+		options: './src/options/options',
+		'content-script': './src/content-script/content-script',
+		'inpage-script': './src/inpage-script/inpage-script',
 	},
 	plugins: [
 		new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
 		new HtmlWebpackPlugin({ 
-			template: 'src/options.html',
+			template: 'src/options/options.html',
 			filename: 'options.html',
 			chunks: ['options'],
 		}),

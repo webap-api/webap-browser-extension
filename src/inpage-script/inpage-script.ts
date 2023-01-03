@@ -1,0 +1,1 @@
+console.log('WebAP: Inpage Script injected');
