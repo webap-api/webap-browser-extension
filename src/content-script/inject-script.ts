@@ -11,6 +11,6 @@ export default function injectScript() {
 		scriptElement.setAttribute('src', browser.runtime.getURL('inpage-script.js'));
 		container.appendChild(scriptElement);
 	} catch (err) {
-	  	console.error('WebAP’s WebAP injection failed', err);
+		console.error('WebAP’s WebAP injection failed', err);
 	}
 }
