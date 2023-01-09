@@ -12,7 +12,7 @@ class ActivityPubClient {
 
 export default class WebAP {
 	async getClients(): Promise<ActivityPubClient[]> {
-		const clients = (await postMessageToContentScript('getClients')).map((clientInMessageResponse) => 
+		const clients = (await postMessageToContentScript('getClients')).map((clientInMessageResponse: any) => 
 		new ActivityPubClient(clientInMessageResponse.alias)
 		);
 		return clients;
