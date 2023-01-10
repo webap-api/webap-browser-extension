@@ -1,6 +1,6 @@
 import React from 'react';
 import browser from 'webextension-polyfill';
-import AccountsManager from './accounts-manager';
+import AccountsManager from '../core/accounts-manager';
 
 type OptionsState = {
 	accountToAddAlias: string;

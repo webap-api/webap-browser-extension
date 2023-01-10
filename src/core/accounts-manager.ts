@@ -1,5 +1,6 @@
 import {Browser} from 'webextension-polyfill';
 import axios from 'axios';
+import ClientAppsManager from './client-apps-manager';
 
 const ACTIVITY_STREAMS_MEDIA_TYPE = 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"';
 
@@ -11,9 +12,11 @@ type Account = {
 
 class AccountsManager {
 	private browser: Browser;
+	private clientAppsManager: ClientAppsManager;
 
 	constructor(browser: Browser) {
 		this.browser = browser;
+		this.clientAppsManager = new ClientAppsManager(browser);
 	}
 
 	async addAccount(alias: string, identifier: string): Promise<Account> {
@@ -21,8 +24,9 @@ class AccountsManager {
 		// Save account
 
 		const domain = AccountsManager.calculateDomainFromUserIdentifier(identifier);
+		const baseUrl = 'https://' + domain;
 
-		const webFingerResponse = await axios.get('https://' + domain + '/.well-known/webfinger', {
+		const webFingerResponse = await axios.get(baseUrl + '/.well-known/webfinger', {
 			headers: {
 				Accept: 'application/jrd+json'
 			},
@@ -41,6 +45,16 @@ class AccountsManager {
 		};
 
 		await this.persistAccount(account);
+
+		try {
+			if(!await this.clientAppsManager.getClient(baseUrl)) {
+				this.clientAppsManager.createClient(baseUrl);
+			}
+		}
+		catch(e) {
+			// Will treat as a warning here because this can be solved later in the process
+			console.warn('Client creation failed during account registration', e);
+		}
 
 		return account;
 	}
