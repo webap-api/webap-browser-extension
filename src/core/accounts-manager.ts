@@ -6,8 +6,15 @@ const ACTIVITY_STREAMS_MEDIA_TYPE = 'application/ld+json; profile="https://www.w
 
 type Account = {
 	alias: string,
+	/** e.g. user@server.org */
 	id: string,
+	/** ActivityPub actor Id of the user */
 	actorId: string,
+}
+
+type AuthorizationRequestProperties = {
+	baseUrl: string,
+	client_id: string
 }
 
 class AccountsManager {
@@ -65,7 +72,24 @@ class AccountsManager {
 		return persistedAccounts.accounts || [];
 	}
 
-	async persistAccount(account: Account) {
+	private async getAccount(alias: string): Promise<Account> {
+		const account = (await this.getAccounts()).find((a) => a.alias = alias);
+
+		return account;
+	}
+
+	async getAuthorizationRequestProperties(alias: string) {
+		const account = await this.getAccount(alias);
+		const baseUrl = 'https://' + AccountsManager.calculateDomainFromUserIdentifier(account.id);
+		const clientApp = await this.clientAppsManager.getClient(baseUrl);
+
+		return {
+			baseUrl: baseUrl,
+			client_id: clientApp.client_id
+		};
+	}
+
+	private async persistAccount(account: Account) {
 		const persistedAccounts = await this.browser.storage.local.get('accounts');
 
 		if(!persistedAccounts.accounts) {

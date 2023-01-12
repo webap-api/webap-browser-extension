@@ -5,13 +5,15 @@ import AccountsManager from '../core/accounts-manager';
 type OptionsState = {
 	accountToAddAlias: string;
 	accountToAddIdentifier: string;
-	accounts: OptionsStateAccount; 
+	accounts: OptionsStateAccount[]; 
 }
 
 type OptionsStateAccount = {
 	alias: string;
 	id: string;
-}[];
+	isAuthenticated: boolean;
+	isWaitingAuthCode: boolean;
+};
 
 class App extends React.Component<{},OptionsState> {
 	private accountsManager: AccountsManager;
@@ -37,7 +39,9 @@ class App extends React.Component<{},OptionsState> {
 		this.setState({
 			accounts: persistedAccounts.map((account) => ({
 				alias: account.alias,
-				id: account.id
+				id: account.id,
+				isAuthenticated: false,
+				isWaitingAuthCode: false,
 			}))
 		});
 	}
@@ -50,9 +54,18 @@ class App extends React.Component<{},OptionsState> {
 		this.setState({accountToAddIdentifier: accountToAddAlias});
 	}
 
-	private async handleAddAccountClick() {
+	private async handleAddAccountClicked() {
 		await this.accountsManager.addAccount(this.state.accountToAddAlias, this.state.accountToAddIdentifier);
 		this.upadateStateFromPersistedAccounts();
+	}
+
+	private async handleAuthenticateAccountClicked(account: OptionsStateAccount) {
+		const arp = await this.accountsManager.getAuthorizationRequestProperties(account.alias);
+
+		const authorizationUrl = `${arp.baseUrl}/oauth/authorize?response_type=code&client_id=${arp.client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob`;
+
+		window.alert('A new tab/window will open where we will ask for your authorization. After approving, copy the authorization code, and enter it back in this page.');
+		window.open(authorizationUrl);
 	}
 
 	render() {
@@ -65,14 +78,14 @@ class App extends React.Component<{},OptionsState> {
 				<label>Account identifier</label>
 				<input onChange={(e) => this.setAccountToAddIdentifier(e.target.value)} value={this.state.accountToAddIdentifier}></input>
 				<br/>
-				<button onClick={(e) => this.handleAddAccountClick()}>Add Account</button>
+				<button onClick={(e) => this.handleAddAccountClicked()}>Add Account</button>
 				<h2>Accounts</h2>
 				{this.state.accounts.length ? this.state.accounts.map((account) => (
 					<div>
 						<h3>{account.alias}</h3>
 						<p>{account.id}</p>
 						<button>Delete</button>
-						<button>Authenticate</button>
+						{!account.isAuthenticated && <button onClick={(e) => this.handleAuthenticateAccountClicked(account)}>Authenticate</button>}
 					</div>
 				)) : <p>No accounts added yet.</p>}
 			</div>
