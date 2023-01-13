@@ -126,7 +126,7 @@ class AccountsManager {
 	}
 
 	private static deriveActivityPubActorIdFromWebfingerJRD(webFingerJRDOject: any): string {
-		const activityPubActorLink = webFingerJRDOject.links && webFingerJRDOject.links.find((link) => link.rel === 'self' && link.type === ACTIVITY_STREAMS_MEDIA_TYPE);
+		const activityPubActorLink = webFingerJRDOject.links && webFingerJRDOject.links.find((link: any) => link.rel === 'self' && link.type === ACTIVITY_STREAMS_MEDIA_TYPE);
 
 		return activityPubActorLink && activityPubActorLink.href;
 	}
