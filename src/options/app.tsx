@@ -13,6 +13,7 @@ type OptionsStateAccount = {
 	id: string;
 	isAuthenticated: boolean;
 	isWaitingAuthCode: boolean;
+	authCode: string;
 };
 
 class App extends React.Component<{},OptionsState> {
@@ -66,6 +67,44 @@ class App extends React.Component<{},OptionsState> {
 
 		window.alert('A new tab/window will open where we will ask for your authorization. After approving, copy the authorization code, and enter it back in this page.');
 		window.open(authorizationUrl);
+
+		this.setAccountIsWaitingForAuthCodeToTrue(account);
+	}
+	
+	setAccountIsWaitingForAuthCodeToTrue(account: OptionsStateAccount) {
+		const newState = this.state;
+
+		newState.accounts.forEach((a) => {
+			if(a.alias === account.alias) {
+				a.isWaitingAuthCode = true;
+			}
+		});
+
+		this.setState(newState);
+	}
+
+	private setAccountAuthCode(account: OptionsStateAccount, authCode:string): void {
+		const newState = this.state;
+
+		newState.accounts.forEach((a) => {
+			if(a.alias === account.alias) {
+				a.authCode = authCode;
+			}
+		});
+
+		this.setState(newState);
+	}
+
+	async handleAccountAuthCodeKeyDown(account: OptionsStateAccount, e: React.KeyboardEvent<HTMLInputElement>): Promise<void> {
+		if(e.key === 'Enter' && account.authCode) {
+			try {
+				await this.accountsManager.fetchAndPersistToken(account.alias, account.authCode);
+				// TODO: update account state, not waiting for authCode anymore, possibly show a dismissible success message
+			}
+			catch(e) {
+				console.log(e);
+			}
+		}
 	}
 
 	render() {
@@ -86,6 +125,15 @@ class App extends React.Component<{},OptionsState> {
 						<p>{account.id}</p>
 						<button>Delete</button>
 						{!account.isAuthenticated && <button onClick={(e) => this.handleAuthenticateAccountClicked(account)}>Authenticate</button>}
+						{account.isWaitingAuthCode && 
+							(<div>
+								<label>Authcode (paste and press enter)</label>
+								<input 
+									onChange={(e) => this.setAccountAuthCode(account, e.target.value)}
+									onKeyDown={(e) => this.handleAccountAuthCodeKeyDown(account, e)}
+									value={account.authCode}></input>
+							</div>)
+						}
 					</div>
 				)) : <p>No accounts added yet.</p>}
 			</div>

@@ -1,6 +1,6 @@
 import {Browser} from 'webextension-polyfill';
 import axios from 'axios';
-import ClientAppsManager from './client-apps-manager';
+import ClientAppsManager, { Client } from './client-apps-manager';
 
 const ACTIVITY_STREAMS_MEDIA_TYPE = 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"';
 
@@ -78,13 +78,11 @@ class AccountsManager {
 		return account;
 	}
 
-	async getAuthorizationRequestProperties(alias: string) {
-		const account = await this.getAccount(alias);
-		const baseUrl = 'https://' + AccountsManager.calculateDomainFromUserIdentifier(account.id);
-		const clientApp = await this.clientAppsManager.getClient(baseUrl);
+	async getAuthorizationRequestProperties(alias: string): Promise<AuthorizationRequestProperties> {
+		const clientApp = await this.getClientForAccount(alias);
 
 		return {
-			baseUrl: baseUrl,
+			baseUrl: clientApp.baseUrl,
 			client_id: clientApp.client_id
 		};
 	}
@@ -129,6 +127,37 @@ class AccountsManager {
 		const activityPubActorLink = webFingerJRDOject.links && webFingerJRDOject.links.find((link: any) => link.rel === 'self' && link.type === ACTIVITY_STREAMS_MEDIA_TYPE);
 
 		return activityPubActorLink && activityPubActorLink.href;
+	}
+
+	async fetchAndPersistToken(alias: string, authCode: string) {
+		const clientApp = await this.getClientForAccount(alias);
+
+		const bodyFormData = new FormData();
+
+		bodyFormData.append('grant_type', 'authorization_code');
+		bodyFormData.append('code', authCode);
+		bodyFormData.append('scopes', 'write read');
+		bodyFormData.append('client_id', clientApp.client_id);
+		bodyFormData.append('client_secret', clientApp.client_secret);
+		// I don't see why redirect_uris is necessary for this request, but is required according to the
+		// API documentation: https://docs.joinmastodon.org/methods/oauth/
+		bodyFormData.append('redirect_uris', 'urn:ietf:wg:oauth:2.0:oob');
+
+		const response = await axios.post(clientApp.baseUrl + '/oauth/token', bodyFormData, {
+			headers: {
+				'Content-Type': 'multipart/form-data'
+			}
+		});
+
+		// TODO: Error handling, access_token must exist, token_type must be Bearer
+		// TODO: persist token
+		console.log(response);
+	}
+
+	async getClientForAccount(alias: string) : Promise <Client> {
+		const account = await this.getAccount(alias);
+		const baseUrl = 'https://' + AccountsManager.calculateDomainFromUserIdentifier(account.id);
+		return this.clientAppsManager.getClient(baseUrl);
 	}
 }
 

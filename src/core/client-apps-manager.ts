@@ -1,7 +1,7 @@
 import {Browser} from 'webextension-polyfill';
 import axios from 'axios';
 
-type Client = {
+export type Client = {
 	baseUrl: string,
 	client_id: string,
 	client_secret: string,
