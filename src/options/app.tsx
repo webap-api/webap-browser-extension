@@ -13,7 +13,7 @@ type OptionsStateAccount = {
 	id: string;
 	isAuthenticated: boolean;
 	isWaitingAuthCode: boolean;
-	authCode: string;
+	authCode?: string;
 };
 
 class App extends React.Component<{},OptionsState> {
