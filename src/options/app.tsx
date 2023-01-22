@@ -60,7 +60,7 @@ class App extends React.Component<{},OptionsState> {
 		this.updateStateFromPersistedAccounts();
 	}
 
-	async deleteAccount(account: OptionsStateAccount): React.MouseEventHandler<HTMLButtonElement> {
+	async deleteAccount(account: OptionsStateAccount) {
 		await this.accountsManager.deleteAccount(account.alias);
 		this.updateStateFromPersistedAccounts();
 	}
