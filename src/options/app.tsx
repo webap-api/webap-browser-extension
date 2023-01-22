@@ -31,10 +31,10 @@ class App extends React.Component<{},OptionsState> {
 	}
 
 	async componentDidMount() {
-		this.upadateStateFromPersistedAccounts();
+		this.updateStateFromPersistedAccounts();
 	}
 
-	private async upadateStateFromPersistedAccounts() {
+	private async updateStateFromPersistedAccounts() {
 		const persistedAccounts = await this.accountsManager.getAccounts();
 
 		this.setState({
@@ -57,12 +57,12 @@ class App extends React.Component<{},OptionsState> {
 
 	private async handleAddAccountClicked() {
 		await this.accountsManager.addAccount(this.state.accountToAddAlias, this.state.accountToAddIdentifier);
-		this.upadateStateFromPersistedAccounts();
+		this.updateStateFromPersistedAccounts();
 	}
 
 	async deleteAccount(account: OptionsStateAccount): React.MouseEventHandler<HTMLButtonElement> {
 		await this.accountsManager.deleteAccount(account.alias);
-		this.upadateStateFromPersistedAccounts();
+		this.updateStateFromPersistedAccounts();
 	}
 
 	private async handleAuthenticateAccountClicked(account: OptionsStateAccount) {
