@@ -60,6 +60,11 @@ class App extends React.Component<{},OptionsState> {
 		this.upadateStateFromPersistedAccounts();
 	}
 
+	async deleteAccount(account: OptionsStateAccount): React.MouseEventHandler<HTMLButtonElement> {
+		await this.accountsManager.deleteAccount(account.alias);
+		this.upadateStateFromPersistedAccounts();
+	}
+
 	private async handleAuthenticateAccountClicked(account: OptionsStateAccount) {
 		const arp = await this.accountsManager.getAuthorizationRequestProperties(account.alias);
 
@@ -123,7 +128,7 @@ class App extends React.Component<{},OptionsState> {
 					<div>
 						<h3>{account.alias}</h3>
 						<p>{account.id}</p>
-						<button>Delete</button>
+						<button onClick={(e) => this.deleteAccount(account)}>Delete</button>
 						{!account.isAuthenticated && <button onClick={(e) => this.handleAuthenticateAccountClicked(account)}>Authenticate</button>}
 						{account.isWaitingAuthCode && 
 							(<div>

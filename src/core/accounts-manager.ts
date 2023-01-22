@@ -65,6 +65,16 @@ class AccountsManager {
 
 		return account;
 	}
+
+	async deleteAccount(alias: string): Promise<void> {
+		const persistedAccounts = await this.getAccounts();
+
+		const accounts = persistedAccounts.filter((account) => account.alias !== alias);
+
+		await this.browser.storage.local.set({
+			accounts: accounts
+		});
+	}
 	
 	async getAccounts(): Promise<Account[]> {
 		const persistedAccounts = await this.browser.storage.local.get('accounts');
