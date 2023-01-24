@@ -41,7 +41,7 @@ class App extends React.Component<{},OptionsState> {
 			accounts: persistedAccounts.map((account) => ({
 				alias: account.alias,
 				id: account.id,
-				isAuthenticated: false,
+				isAuthenticated: account.accessToken ? true : false,
 				isWaitingAuthCode: false,
 			}))
 		});
@@ -104,7 +104,7 @@ class App extends React.Component<{},OptionsState> {
 		if(e.key === 'Enter' && account.authCode) {
 			try {
 				await this.accountsManager.fetchAndPersistToken(account.alias, account.authCode);
-				// TODO: update account state, not waiting for authCode anymore, possibly show a dismissible success message
+				this.updateStateFromPersistedAccounts();
 			}
 			catch(e) {
 				console.log(e);

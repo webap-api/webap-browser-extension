@@ -10,6 +10,7 @@ type Account = {
 	id: string,
 	/** ActivityPub actor Id of the user */
 	actorId: string,
+	accessToken?: string,
 }
 
 type AuthorizationRequestProperties = {
@@ -97,7 +98,7 @@ class AccountsManager {
 		};
 	}
 
-	private async persistAccount(account: Account) {
+	private async persistAccount(account: Account, replaceExisting?: boolean) {
 		const persistedAccounts = await this.browser.storage.local.get('accounts');
 
 		if(!persistedAccounts.accounts) {
@@ -105,17 +106,22 @@ class AccountsManager {
 		}
 
 		if(!Array.isArray(persistedAccounts.accounts)) {
+			// should only happen if persistency is corrupted
 			throw Error('Persisted accounts is not an Array');
 		}
 		
-		if(persistedAccounts.accounts.find((persistedAccount: any) => persistedAccount.alias === account.alias)) {
+		if(!replaceExisting && persistedAccounts.accounts.find((persistedAccount: any) => persistedAccount.alias === account.alias)) {
 			throw Error(`Account already exist with alias: ${account.alias}`);
+		}
+		else if(replaceExisting) {
+			persistedAccounts.accounts = persistedAccounts.accounts.filter((persistedAccount) => persistedAccount.alias !== account.alias);
 		}
 
 		persistedAccounts.accounts.push({
 			alias: account.alias,
 			id: account.id,
-			actorId: account.actorId
+			actorId: account.actorId,
+			accessToken: account.accessToken,
 		});
 
 		await this.browser.storage.local.set({
@@ -159,9 +165,22 @@ class AccountsManager {
 			}
 		});
 
+		// Here is documentation on the Access Token Response
+		// https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/
+
 		// TODO: Error handling, access_token must exist, token_type must be Bearer
 		// TODO: persist token
 		console.log(response);
+
+		await this.updateAccountToken(alias, response.data.access_token);
+	}
+
+	async updateAccountToken(alias: string, accessToken: string) {
+		const account = await this.getAccount(alias);
+		
+		account.accessToken = accessToken;
+
+		await this.persistAccount(account, true);
 	}
 
 	async getClientForAccount(alias: string) : Promise <Client> {
