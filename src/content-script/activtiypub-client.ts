@@ -1,7 +1,3 @@
-const messageHandlers = {
-	'getClients': getClients,
-}
-
 export default function registerWebAPWindowMessageHandler() { 
 	window.addEventListener('message', webAPWindowMessageHandler);
 }
