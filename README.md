@@ -10,6 +10,6 @@ Until there is a reasonably stable data model and API, it it will remain with ma
 
 ## References
 
-The initial state of the respository and tooling setup is largely based on podStation.
+The initial state of the repository and tooling setup is largely based on [podStation](https://github.com/podStation/podStation/tree/4fc7de2bde3f6767fc31013965fdf13aab78c47c).
 
-Many of the concepts were inspired or even copied from Joule, which analogously implement the WebLN API.
+Many of the concepts were inspired or even copied from [Joule](https://lightningjoule.com/), which analogously implement the WebLN API.
