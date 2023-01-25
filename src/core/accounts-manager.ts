@@ -83,7 +83,7 @@ class AccountsManager {
 		return persistedAccounts.accounts || [];
 	}
 
-	private async getAccount(alias: string): Promise<Account> {
+	async getAccount(alias: string): Promise<Account> {
 		const account = (await this.getAccounts()).find((a) => a.alias = alias);
 
 		return account;

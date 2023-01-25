@@ -9,6 +9,7 @@ const packageInformation = require('./package.json');
 module.exports = {
 	entry: {
 		options: './src/options/options',
+		background: './src/background/background',
 		'content-script': './src/content-script/content-script',
 		'inpage-script': './src/inpage-script/inpage-script',
 	},

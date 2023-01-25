@@ -8,6 +8,12 @@
 	"permissions": [
 		"storage"
 	],
+	"host_permissions": [
+		"https://*/*"
+	],
+	"background": {
+		"service_worker": "background.js"
+	},
 	"content_scripts": [{
 		"matches": ["https://*/*"],
 		"js": ["content-script.js"],

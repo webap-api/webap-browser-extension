@@ -1,8 +1,13 @@
+import browser from 'webextension-polyfill';
+import AccountsManager from '../core/accounts-manager';
+
+const accountsManager = new AccountsManager(browser);
+
 export default function registerWebAPWindowMessageHandler() { 
 	window.addEventListener('message', webAPWindowMessageHandler);
 }
 
-function webAPWindowMessageHandler(ev: MessageEvent) {
+async function webAPWindowMessageHandler(ev: MessageEvent) {
 	if(!ev.data || ev.data.application !== 'WebAP' || ev.data.isResponse) {
 		return;
 	}
@@ -13,10 +18,13 @@ function webAPWindowMessageHandler(ev: MessageEvent) {
 	try {
 		switch(ev.data.type) {
 			case 'getClients':
-				responseBody = getClients();
+				responseBody = await getClients();
 				break;
 			case 'postToOutbox':
-				responseBody = postToOutbox(ev.data.body);
+				// This had to be delegated to the background service worker, sending it
+				// from the content script was not working due to a CORS error, even with
+				// host_permissions set in the manifest.json file 
+				responseBody = await browser.runtime.sendMessage(ev.data);
 				break;
 		}
 	}
@@ -33,17 +41,14 @@ function webAPWindowMessageHandler(ev: MessageEvent) {
 	});
 }
 
-type GetClientsMessageBody = [{
+type GetClientsMessageBody = {
 	alias: string;
-}];
+}[];
 
-function getClients(): GetClientsMessageBody {
-	return [{
-		alias: 'My account on fosstodon'
-	}]
-}
+async function getClients(): Promise<GetClientsMessageBody> {
+	const accounts = await accountsManager.getAccounts();
 
-function postToOutbox(body: any) {
-	console.log(body);
-	return;
+	return accounts.map((account) => ({
+		alias: account.alias
+	}))
 }
